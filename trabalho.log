@@ -1,0 +1,213 @@
+import time
+import os
+from colorama import init, Fore
+
+from trabalho_igor import Funcionario
+init()
+
+class ControleAcesso:
+    def __init__(self):
+        self.credenciais = {}  # Dicionário para armazenar as credenciais dos usuários
+
+    def registrar_usuario(self, id, senha):
+        self.credenciais[id] = senha
+
+    def verificar_credenciais(self, id, senha):
+        if id in self.credenciais and self.credenciais[id] == senha:
+            return True
+        return False
+
+class Biblioteca:
+    def __init__(self, controle_acesso):
+        self.catalogo = [
+            {"nome": "Dom Casmurro", "isbn": "978-85-01-01952-5", "data_publicacao": "1899", "editora": "Globo", "genero": "Romance", "estado": True},
+            {"nome": "Capitães da Areia", "isbn": "978-85-01-01679-1", "data_publicacao": "1937", "editora": "Companhia das Letras", "genero": "Ficção", "estado": True},
+            {"nome": "O Cortiço", "isbn": "978-85-01-04902-0", "data_publicacao": "1890", "editora": "Ática", "genero": "Ficção", "estado": True}
+        ]
+        self.emprestados = []
+        self.controle_acesso = controle_acesso
+
+    def infocatalogo(self):
+        for livro in self.catalogo:
+            print(Fore.LIGHTYELLOW_EX + f'\nNome do livro:' + Fore.RESET, Fore.CYAN + f'{livro["nome"]}\n' + Fore.RESET)
+            print(Fore.LIGHTYELLOW_EX + f'ISBN:' + Fore.RESET, Fore.CYAN + f'{livro["isbn"]}.\n' + Fore.RESET)
+            print(Fore.LIGHTYELLOW_EX + f'Data de publicação:' + Fore.RESET, Fore.CYAN + f'{livro["data_publicacao"]}.\n' + Fore.RESET)
+            print(Fore.LIGHTYELLOW_EX + f'Editora:' + Fore.RESET, Fore.CYAN + f'{livro["editora"]}.\n' + Fore.RESET)
+            print(Fore.LIGHTYELLOW_EX + f'Gênero:' + Fore.RESET, Fore.CYAN + f'{livro["genero"]}\n' + Fore.RESET)
+            if livro not in self.emprestados:
+                print(Fore.LIGHTYELLOW_EX + f"Disponibilidade:" + Fore.RESET, Fore.GREEN + "Disponível\n" + Fore.RESET)
+            else:
+                print(Fore.LIGHTYELLOW_EX + f"Disponibilidade:" + Fore.RESET, Fore.RED + "Indisponível\n" + Fore.RESET)
+            print('-'*30)
+
+class Gerente:
+    def __init__(self, nome_g, anos_g, cpf_g, id, senha, controle_acesso):
+        self.nome_g = nome_g
+        self.anos_g = anos_g
+        self.cpf_g = cpf_g
+        self.id = id 
+        self.senha = senha
+        self.funcionarios = []
+        self.controle_acesso = controle_acesso
+
+    def addfuncionario(self, nome, sobrenome, cpf, idade, funcao, id, senha):
+        novo_funcionario = {f"Nome": nome, "Sobrenome": sobrenome, "Cpf": cpf, "Idade": idade, "Funcao": funcao, "Id": id, "Senha": senha}
+        self.funcionarios.append(novo_funcionario)
+        print(f'\nFuncionário :{nome} cadastrado com sucesso!')
+
+    def removefuncionario(self, funcionario):
+        if funcionario in self.funcionarios:
+            self.funcionarios.remove(funcionario)
+            print(f'Lista de funcionários atualizada:{self.funcionarios}')
+        else:
+            print(f'Funcionário {funcionario} não encontrado')
+
+    def infogerente(self):
+        print(f'\nNome do gerente:{self.nome_g}\n'
+              f'Quantidade de pessoas que trabalham para o gerente:{len(self.funcionarios)}')
+        print(f'Lista de funcionários que trabalham para o gerente: ')
+        for funcionario in self.funcionarios:
+            print(f'- {funcionario["Nome"]} {funcionario["Sobrenome"]}')
+
+    def add_livro(self, nome, isbn, data_publicacao, editora, genero):
+        for livro in biblioteca.catalogo:
+            if nome == livro["nome"]:
+                print(f'"{nome}" já está no catálogo!')
+                break
+            else:
+                novo_livro = {"nome": nome, "isbn": isbn, "data_publicacao": data_publicacao, "editora": editora, "genero": genero}
+                num = input(f'Você tem certeza que deseja adicionar o livro "{nome}" ao catálogo? Se sim, digite "2"')
+                if num == "2":
+                    biblioteca.catalogo.append(novo_livro)
+                    print(f'"{nome}" adicionado ao catálogo com sucesso!')
+                    break
+                else:
+                    print('Operação cancelada!')
+                    break
+
+    @staticmethod
+    def delete_livro(deletar):
+        for livro in biblioteca.catalogo:
+            if deletar == livro["nome"]:
+                num = input(f'\nVocê tem certeza que deseja deletar o livro "{deletar}"? Para prosseguir, digite 1.')
+                if num == "1":
+                    biblioteca.catalogo.remove(livro)
+                    print(f'"{deletar}" deletado do catálogo!')
+                    break
+                else:
+                    print('Operação cancelada')
+                    break
+            else:
+                print(f'\nO livro "{deletar}" não foi encontrado no catálogo.')
+                break
+
+
+
+def menu_principal():
+    print("1. Visualizar catálogo de livros")
+    print("2. Sair")
+    opcao = input("Escolha uma opção: ")
+    return opcao
+
+def menu_gerente():
+    print("1. Adicionar livro")
+    print("2. Remover livro")
+    print("3. Adicionar funcionário")
+    print("4. Remover funcionário")
+    print("5. Visualizar informações do gerente")
+    print("6. Visualizar catálogo de livros")
+    print("7. Sair")
+    opcao = input("Escolha uma opção: ")
+    return opcao
+
+def menu_funcionario():
+    print("1. Visualizar catálogo de livros")
+    print("2. Emprestar livro")
+    print("3. Devolver livro")
+    print("4. Visualizar informações do funcionário")
+    print("5. Sair")
+    opcao = input("Escolha uma opção: ")
+    return opcao
+
+# Criar instância do controle de acesso
+controle_acesso = ControleAcesso()
+
+# Adicionar usuários ao controle de acesso
+controle_acesso.registrar_usuario("gerente", "123")
+controle_acesso.registrar_usuario("funcionario", "456")
+
+# Criar instância da biblioteca
+biblioteca = Biblioteca(controle_acesso)
+
+# Loop principal
+while True:
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("Bem-vindo à Biblioteca!\n")
+    print("Por favor, faça login:")
+    usuario = input("Usuário: ")
+    senha = input("Senha: ")
+
+    if controle_acesso.verificar_credenciais(usuario, senha):
+        if usuario == "gerente":
+            while True:
+                opcao = menu_gerente()
+                if opcao == "1":
+                    # Adicionar livro
+                    nome = input("Nome do livro: ")
+                    isbn = input("ISBN: ")
+                    data_publicacao = input("Data de publicação: ")
+                    editora = input("Editora: ")
+                    genero = input("Gênero: ")
+                    gerente.add_livro(nome, isbn, data_publicacao, editora, genero)
+                elif opcao == "2":
+                    # Remover livro
+                    nome = input("Nome do livro a ser removido: ")
+                    gerente.delete_livro(nome)
+                elif opcao == "3":
+                    # Adicionar funcionário
+                    nome = input("Nome: ")
+                    sobrenome = input("Sobrenome: ")
+                    cpf = input("CPF: ")
+                    idade = input("Idade: ")
+                    funcao = input("Função: ")
+                    id = input("ID: ")
+                    senha = input("Senha: ")
+                    gerente.addfuncionario(nome, sobrenome, cpf, idade, funcao, id, senha)
+                elif opcao == "4":
+                    # Remover funcionário
+                    nome = input("Nome do funcionário a ser removido: ")
+                    gerente.removefuncionario(nome)
+                elif opcao == "5":
+                    # Visualizar informações do gerente
+                    gerente.infogerente()
+                elif opcao == "6":
+                    # Visualizar catálogo de livros
+                    biblioteca.infocatalogo()
+                elif opcao == "7":
+                    # Sair
+                    break
+        elif usuario == "funcionario":
+            while True:
+                opcao = menu_funcionario()
+                if opcao == "1":
+                    # Visualizar catálogo de livros
+                    biblioteca.infocatalogo()
+                elif opcao == "2":
+                    # Emprestar livro
+                    nome_livro = input("Nome do livro a ser emprestado: ")
+                    funcionario.emprestar_livro(nome_livro)
+                elif opcao == "3":
+                    # Devolver livro
+                    nome_livro = input("Nome do livro a ser devolvido: ")
+                    dias_atraso = int(input("Dias de atraso (0 se devolvido no prazo): "))
+                    funcionario.devolver_livro(nome_livro, dias_atraso)
+                elif opcao == "4":
+                    # Visualizar informações do funcionário
+                    print("Informações do funcionário:")
+                    # Aqui você pode adicionar informações específicas do funcionário
+                elif opcao == "5":
+                    # Sair
+                    break
+    else:
+        print("Credenciais inválidas. Por favor, tente novamente.")
+        time.sleep(2)
